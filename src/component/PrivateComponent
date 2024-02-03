@@ -1,0 +1,12 @@
+// PrivateComponent.js
+import React from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+
+const PrivateComponent = () => {
+  // Check if the user is authenticated (you may use a different method to determine authentication status)
+  const isAuthenticated = sessionStorage.getItem('user');
+
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Outlet />;
+};
+
+export default PrivateComponent;
