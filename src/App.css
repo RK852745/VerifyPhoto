@@ -37,7 +37,23 @@
   }
 }
 /* Custom CSS to adjust the width of the dropdown */
-.custom-dropdown {
-  width: auto; /* Set the width as desired */
-  min-width: 60px; /* Set a minimum width */
+.custom-form-group {
+  width: 150px; /* Adjust the width as needed */
+}
+:root {
+  --primary-color: #D16BA5;
+  --secondary-color: #86A8E7;
+  --tertiary-color: #5FFBF1;
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+
+.bg-tertiary {
+  background-color: var(--tertiary-color);
 }

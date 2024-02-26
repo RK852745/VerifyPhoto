@@ -81,7 +81,7 @@ function VerifyImg() {
         isImageApproved: status,
         imageKey: selectedVehicle.imageDetails,
         vehicleNo: selectedVehicle.vehicleNo,
-        requestedBy: Username,
+        requestedBy: Phone,
         requestNo: String(uniqueRequestNo),
         mobileNo: Phone,
       };
@@ -113,9 +113,9 @@ function VerifyImg() {
     setSelectedImage(null);
   };
 
-  const handleGoBack = () => {
-    navigate('/dashboard');
-    //window.location.reload(); 
+  const handleGoBack = () => { 
+    navigate('/dashboard'); 
+    //window.location.reload();
   };
 
   return (
@@ -151,41 +151,46 @@ function VerifyImg() {
                     </tr>
                   </thead>
                   <tbody className="text-center">
-                    {vehicleDetails.map((vehicle, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>
-                          {(vehicle.isImageApproved === 'Approved' || vehicle.isImageApproved === 'approved') && (
-                            <i className="fas fa-check text-success" style={{ fontSize: '24px' }} />
-                          )}
-                          {(vehicle.isImageApproved === 'Rejected' || vehicle.isImageApproved === 'rejected') && (
-                            <i className="fas fa-times text-danger" style={{ fontSize: '24px' }} />
-                          )}
-                          {(vehicle.isImageApproved === 'Pending' || vehicle.isImageApproved === 'pending') && (
-                            <i className="fas fa-clock text-warning" style={{ fontSize: '24px' }}></i>
-                          )}
-                        </td>
-                        <td>{vehicle.imageType}</td>
-                        <td onClick={() => handleViewImage(vehicle.imageDetails)}>
-                          <center>
-                            <i className="fas fa-eye"></i>
-                          </center>
-                        </td>
-                        <td>
-                          <button type="button" className="btn btn-success btn-sm px-3"
-                            onClick={() => handleImageStausChange('Approved', vehicle.imageDetails)}>
-                            Approve
-                          </button>
-                        </td>
-                        <td>
-                          <button type="button" className="btn btn-danger btn-sm px-3"
-                            onClick={() => handleImageStausChange('Rejected', vehicle.imageDetails)}>
-                            Reject
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+  {vehicleDetails.map((vehicle, index) => (
+    <tr key={index}>
+      <td>{index + 1}</td>
+      <td>
+        {(vehicle.isImageApproved === 'Approved' || vehicle.isImageApproved === 'approved') && (
+          <i className="fas fa-check text-success" style={{ fontSize: '24px' }} />
+        )}
+        {(vehicle.isImageApproved === 'Rejected' || vehicle.isImageApproved === 'rejected') && (
+          <i className="fas fa-times text-danger" style={{ fontSize: '24px' }} />
+        )}
+        {(vehicle.isImageApproved === 'Pending' || vehicle.isImageApproved === 'pending') && (
+          <i className="fas fa-clock text-warning" style={{ fontSize: '24px' }}></i>
+        )}
+      </td>
+      <td>{vehicle.imageType}</td>
+      <td onClick={() => handleViewImage(vehicle.imageDetails)}>
+        <center>
+          <i className="fas fa-eye"></i>
+        </center>
+      </td>
+      <td>
+        {vehicle.isImageApproved === 'Pending' && (
+          <button type="button" className="btn btn-success btn-sm px-3"
+            onClick={() => handleImageStausChange('Approved', vehicle.imageDetails)}>
+            Approve
+          </button>
+        )}
+      </td>
+      <td>
+        {vehicle.isImageApproved === 'Pending' && (
+          <button type="button" className="btn btn-danger btn-sm px-3"
+            onClick={() => handleImageStausChange('Rejected', vehicle.imageDetails)}>
+            Reject
+          </button>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
                 </table>
               </div>
             </div>

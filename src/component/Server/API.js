@@ -3,7 +3,7 @@
 // UserLogin
 export const UserLogin = async (requestData) => {
   try {
-    const response = await fetch('https://testapi.trucksups.in/TrucksUpFOAPI/Fieldofficer/Login', {
+    const response = await fetch('https://sslapi.trucksups.in/TrucksUpFOAPI_V1/Fieldofficer/Login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ export const UserLogin = async (requestData) => {
     const data = await response.json();
     console.log("APIjs", data);
 
-    if (response.status === 200 && data.status === 200 && data.message === 'Successful') {
+    if (response.status === 200 && data.status === 200 && data.message === 'Database connection open') {
       // Assuming your API returns a user_id, customer_Name, and mobile in the response
       const user = {
         userId: data.data.user_id,
@@ -36,7 +36,7 @@ export const UserLogin = async (requestData) => {
 //getImageStatusDetails
 export const getImageStatusDetails = async (requestData) => {
   try {
-    const response = await fetch('https://testapi.trucksups.in/Apigateway/Gateway/GetImageStatusDetails', {
+    const response = await fetch('https://sslapi.trucksups.in/Apigateway/Gateway/GetImageStatusDetails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json', 
@@ -89,7 +89,7 @@ export const getImageFile = async (fileName) => {
 //updateimagestatus
 export const updateImageStatus = async (requestData) => {
   try {
-    const response = await fetch('https://testapi.trucksups.in/Apigateway/Gateway/UpdateImageStatus', {
+    const response = await fetch('https://sslapi.trucksups.in/Apigateway/Gateway/UpdateImageStatus', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

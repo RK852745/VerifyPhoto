@@ -1,0 +1,366 @@
+import React, { useState, useEffect } from 'react';
+import { getImageStatusDetails } from './Server/API';
+import { Link } from 'react-router-dom';
+import 'datatables.net-dt/css/jquery.dataTables.css';
+import $ from 'jquery';
+import 'datatables.net';
+
+function Dashboard() {
+  //const [allVehicleDetails, setAllVehicleDetails] = useState([]);
+  const [vehicleNumber, setVehicleNumber] = useState('');
+  const [filteredVehicleDetails, setFilteredVehicleDetails] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [status, setStatus] = useState('');
+  const [searchByDateRangeActive, setSearchByDateRangeActive] = useState(true);
+  const [searchByVehicleNumberActive, setSearchByVehicleNumberActive] = useState(false);
+
+  
+  const storedUserData = JSON.parse(sessionStorage.getItem('user'));
+  const Phone = storedUserData.mobile;
+  console.log(storedUserData);
+
+  useEffect(() => {
+    // Set default values for start and end dates
+    const today = new Date().toISOString().split('T')[0];
+    setStartDate(today);
+    setEndDate(today);
+    const uniqueRequestNo = generateUniqueRequestNo();
+    // Fetch data with default dates
+    fetchData({
+      vehicleNo: '',
+      startDate: today,
+      endDate: today,
+      status: '',
+      requestNo: String(uniqueRequestNo),
+      requestedBy: Phone,
+    });
+  }, [Phone]);
+
+  useEffect(() => {
+    // Update DataTable when filteredVehicleDetails changes
+    if (filteredVehicleDetails && filteredVehicleDetails.data) {
+      // Initialize DataTable only when data is available
+      $('#datatable').DataTable().destroy();
+      $('#datatable').DataTable();
+    }
+  }, [filteredVehicleDetails]);
+
+  const handleInputChange = (event) => {
+    const inputValue = event.target.value.toUpperCase();
+    const formattedValue = inputValue.replace(/[^A-Z0-9]/g, '');
+
+    if (formattedValue.length <= 10) {
+      setVehicleNumber(formattedValue);
+    }
+  };
+
+  const isValidVehicleNumber = () => {
+    return vehicleNumber.length === 10;
+  };
+
+  const handleSearch = async () => {
+    // Ensure that the vehicle number is valid before making the API call
+    const uniqueRequestNo = generateUniqueRequestNo();
+    if (isValidVehicleNumber()) {
+      const requestData = {
+        startDate: '',
+        endDate: '',
+        status: '',
+        vehicleNo: vehicleNumber,
+        requestNo: String(uniqueRequestNo),
+        requestedBy: Phone,
+      };
+
+      try {
+        const response = await getImageStatusDetails(requestData);
+        console.log('Response Data by vehicle search:', response);
+
+        if (response.success) {
+          console.log(response.data || []);
+          // Update the state variable with the new data
+          setFilteredVehicleDetails(response.data || []);
+        } else {
+          console.error('API request unsuccessful:', response.message);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    } else {
+      // Handle invalid vehicle number
+      console.error('Invalid Vehicle Number');
+    }
+  };
+
+  const countImageStatus = (images, status) => {
+    return images.filter((image) => image.isImageApproved === status).length;
+  };
+
+  const fetchData = async (requestData) => {
+    try {
+      const response = await getImageStatusDetails(requestData);
+
+      if (response.success) {
+        console.log(response.data || []);
+        setFilteredVehicleDetails(response.data || []);
+      } else {
+        console.error('API request unsuccessful:', response.message);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleSearchByDateRange = () => {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const status = document.getElementById('status').value;
+    const uniqueRequestNo = generateUniqueRequestNo();
+
+    console.log('Start Date:', startDate);
+    console.log('End Date:', endDate);
+    console.log('Status: ', status);
+    const requestData = {
+      vehicleNo: '',
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      requestNo: String(uniqueRequestNo),
+      requestedBy: Phone,
+    };
+    console.log('dashbordpage', requestData);
+
+    // Call the fetchData function with the requestData
+    fetchData(requestData);
+  };
+
+  const handleSearchByVehicleNumber = () => {
+    // Add the logic to handle search by vehicle number here
+    // You can use the existing handleSearch logic as a reference
+    console.log('Search by Vehicle Number:', vehicleNumber);
+  };
+
+  const generateUniqueRequestNo = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+  };
+
+  return (
+    <div>
+      <div className="container-fluid">
+        <div className="card shadow mb-4">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-3">
+                <label htmlFor="searchType" className="text-left">
+                  Search Type:
+                </label>
+                <select
+                  id="searchType"
+                  className="form-control"
+                  onChange={(e) => {
+                    if (e.target.value === 'dateRange') {
+                      setSearchByDateRangeActive(true);
+                      setSearchByVehicleNumberActive(false);
+                    } else {
+                      setSearchByDateRangeActive(false);
+                      setSearchByVehicleNumberActive(true);
+                    }
+                  }}
+                >
+                  <option value="dateRange">By Date Range</option>
+                  <option value="vehicleNumber">By Vehicle Number</option>
+                </select>
+              </div>
+            </div>
+            {searchByDateRangeActive && (
+              <div className="row mt-3">
+                <div className="col-md-3">
+                  <label htmlFor="startDate" className="text-left">
+                    Start Date:
+                  </label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    className="form-control"
+                    placeholder="Enter Start Date"
+                    onChange={(e) => setStartDate(e.target.value)}
+                    value={startDate}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label htmlFor="endDate" className="text-left">
+                    End Date:
+                  </label>
+                  <input
+                    type="date"
+                    id="endDate"
+                    className="form-control"
+                    placeholder="Enter End Date"
+                    onChange={(e) => setEndDate(e.target.value)}
+                    value={endDate}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label htmlFor="status" className="text-left">
+                    Status:
+                  </label>
+                  <select
+                    id="status"
+                    className="form-control"
+                    onChange={(e) => setStatus(e.target.value)}
+                    value={status}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
+                <div className="col-md-3">
+                  <label className="text-left">&nbsp;</label>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-block"
+                    onClick={handleSearchByDateRange}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            )}
+            {searchByVehicleNumberActive && (
+              <div className="row mt-3">
+                <div className="col-md-3">
+                  <label htmlFor="searchBox" className="text-left">
+                    Enter Vehicle Number:
+                  </label>
+                  <input
+                    type="text"
+                    id="searchBox"
+                    className={`form-control ${
+                      isValidVehicleNumber() ? 'is-valid' : 'is-invalid'
+                    }`}
+                    placeholder="Enter Vehicle Number"
+                    value={vehicleNumber}
+                    onChange={handleInputChange}
+                  />
+                  <div className="valid-feedback  ">Valid Vehicle Number</div>
+                  <div className="invalid-feedback  ">Invalid Vehicle Number</div>
+                </div>
+                <div className="col-md-1">
+                  <label className="text-left">&nbsp;</label>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-block"
+                    onClick={handleSearchByVehicleNumber}
+                  >
+                    <i className="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="card shadow mb-4">
+          <div className="card-header py-3">
+            <h6 className="m-0 font-weight-bold text-primary">Vehicle List</h6>
+          </div>
+          <div className="card-body">
+            <div className="table-responsive">
+              <table id="datatable" className="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>SNo</th>
+                    <th>View</th>
+                    <th>VehicleNo</th>
+                    <th>BatchId</th>
+                    <th>CountImage</th>
+                    <th>Approved</th>
+                    <th>Pending</th>
+                    <th>Reject</th>
+                    <th>AdvID</th>
+                    <th>PostedDate</th>
+                    <th>VerifiedBy</th>
+                    <th>VerifiedDate</th>
+                    <th>RejectedBy</th>
+                    <th>RejectedDate</th>
+                  </tr>
+                </thead>
+                <tfoot>
+                  <tr>
+                    <th>SNo</th>
+                    <th>View</th>
+                    <th>VehicleNo</th>
+                    <th>BatchId</th>
+                    <th>CountImage</th>
+                    <th>Approved</th>
+                    <th>Pending</th>
+                    <th>Reject</th>
+                    <th>AdvID</th>
+                    <th>PostedDate</th>
+                    <th>VerifiedBy</th>
+                    <th>VerifiedDate</th>
+                    <th>RejectedBy</th>
+                    <th>RejectedDate</th>
+                  </tr>
+                </tfoot>
+                <tbody>
+                  {filteredVehicleDetails && filteredVehicleDetails.data ? (
+                    filteredVehicleDetails.data.map((vehicle, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <Link to={`/verify/${vehicle.vehicleNo}`}>
+                            <center>
+                              <i className="fas fa-eye"></i>
+                            </center>
+                          </Link>
+                        </td>
+                        <td>{vehicle.vehicleNo}</td>
+                        <td>BatchId</td>
+                        <td>
+                          {' '}
+                          <i className="fas fa-image text-primary"></i> &nbsp;
+                          {vehicle.getVehicleImagesStatus.length}{' '}
+                        </td>
+                        <td>
+                          {' '}
+                          <i className="fas fa-check text-success"></i> &nbsp;
+                          {countImageStatus(vehicle.getVehicleImagesStatus, 'Approved')}{' '}
+                        </td>
+                        <td>
+                          {' '}
+                          <i className="fas fa-clock text-warning"></i> &nbsp;
+                          {countImageStatus(vehicle.getVehicleImagesStatus, 'pending', true)}
+                        </td>
+                        <td>
+                          {' '}
+                          <i className="fas fa-times text-danger"></i> &nbsp;{' '}
+                          {countImageStatus(vehicle.getVehicleImagesStatus, 'Rejected')}
+                        </td>
+                        <td>{vehicle.advertisementId}</td>
+                        <td>{vehicle.postedDate}</td>
+                        <td>{vehicle.verifiedBy}</td>
+                        <td>{vehicle.verifiedDate}</td>
+                        <td>{vehicle.rejectedBy}</td>
+                        <td>{vehicle.rejectedDate}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="14">
+                        <center>No data found.</center>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;

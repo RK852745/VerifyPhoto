@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './component/Dashboard';
 import Navbar from './component/Navbar';
@@ -29,8 +28,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Navbar is rendered for all routes */}
-        <Route path="/*" element={<Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />} />
+        {/* Route for the root URL */}
+        <Route path="/" element={<Navigate to="/login" />} />
 
         {/* Dashboard route */}
         <Route path="/dashboard" element={isLoggedIn ? (
@@ -39,7 +38,7 @@ function App() {
             <Dashboard />
           </DashboardLayout>
         ) : (
-          <Navigate to="login" />
+          <Navigate to="/login" />
         )} />
 
         {/* Verification page route */}
@@ -56,7 +55,7 @@ function App() {
         />
 
         {/* Login page route */}
-        <Route path="login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
       </Routes>
     </Router>
   );

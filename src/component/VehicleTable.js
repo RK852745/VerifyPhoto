@@ -28,10 +28,10 @@ const VehicleTable = ({ filteredVehicleDetails }) => {
     <div className="card-body">
       <div className="vehicle-table table-responsive">
         {/* Rows per page selector */}
-        <Form.Group className="sm-3">
+        <Form.Group className="sm-3" >
           <Form.Label>Rows per page:</Form.Label>
-          <Form.Control as="select" value={rowsPerPage} onChange={handleRowsPerPageChange} className="custom-dropdown">
-         <option value={5}>5</option>
+          <Form.Control as="select" value={rowsPerPage} onChange={handleRowsPerPageChange} className="custom-dropdown" style={{width:'100px'}}>
+             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>

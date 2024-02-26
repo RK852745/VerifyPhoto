@@ -40,7 +40,7 @@ function Dashboard() {
       };
       fetchData(requestData);
     } else {
-      setEndDate(today); // Ensure endDate is set to today if not found in sessionStorage
+      setEndDate();  
     }
   
     setSearchOption(savedSelection.searchOption || 'dateRange');
@@ -56,11 +56,13 @@ function Dashboard() {
     setStartDate(date);
     saveSearchSelection({ startDate: date });
   };
-
   const handleEndDateChange = (date) => {
     setEndDate(date);
     saveSearchSelection({ endDate: date });
   };
+  
+
+
 
   const handleStatusChange = (selectedStatus) => {
     setStatus(selectedStatus);
@@ -79,6 +81,7 @@ function Dashboard() {
         title: 'Incomplete Search',
         text: 'Please select both start date, end date, and status.',
       });
+      window.location.reload();
       return;
     }
 
@@ -90,6 +93,7 @@ function Dashboard() {
       requestNo: String(generateUniqueRequestNo()),
       requestedBy: Phone,
     };
+    console.log("Request datae raneg ",requestData)
 
     fetchData(requestData);
   };
@@ -112,21 +116,7 @@ function Dashboard() {
       requestNo: String(generateUniqueRequestNo()),
       requestedBy: Phone,
     };
-
-    try {
-      const response = await getImageStatusDetails(requestData);
-      if (response.success) {
-        setFilteredVehicleDetails(response.data || []);
-      } else {
-        Swal.fire({
-          icon: 'info',
-          title: 'No Records Found',
-          text: 'Sorry, no records were found for this vehicle.',
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+    fetchData(requestData);
   };
 
   const fetchData = async (requestData) => {

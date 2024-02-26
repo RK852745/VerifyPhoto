@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const SearchForm = ({
   searchOption,
@@ -14,44 +14,55 @@ const SearchForm = ({
   onSearchByDateRange,
   onSearchByVehicleNumber,
 }) => {
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [isVehicleNumberValid, setIsVehicleNumberValid] = useState(false);
+
+  useEffect(() => {
+    setInitialLoad(false);
+  }, []);
+
+  useEffect(() => {
+    // Check vehicle number validity only if it's not the initial load
+    if (!initialLoad) {
+      setIsVehicleNumberValid(vehicleNumber.length === 10);
+    }
+  }, [vehicleNumber, initialLoad]);
+
   return (
     <div className="search-form">
       <div className="row">
         <div className="col-md-2">
           <label>Search by:</label>
           <div className="form-check">
-  <input
-    type="radio"
-    id="dateRangeRadio"
-    className="form-check-input"
-    value="dateRange"
-    checked={searchOption === 'dateRange'}
-    onChange={() => {
-      onSearchOptionChange('dateRange');
-      window.location.reload(); // Refresh the page
-    }}
-  />
-  <label className="form-check-label" htmlFor="dateRangeRadio">
-    Date Range
-  </label>
-</div>
-<div className="form-check">
-  <input
-    type="radio"
-    id="vehicleNumberRadio"
-    className="form-check-input"
-    value="vehicleNumber"
-    checked={searchOption === 'vehicleNumber'}
-    onChange={() => {
-      onSearchOptionChange('vehicleNumber');
-      window.location.reload(); // Refresh the page
-    }}
-  />
-  <label className="form-check-label" htmlFor="vehicleNumberRadio">
-    Vehicle Number
-  </label>
-</div>
-
+            <input
+              type="radio"
+              id="dateRangeRadio"
+              className="form-check-input"
+              value="dateRange"
+              checked={searchOption === 'dateRange'}
+              onChange={() => {
+                onSearchOptionChange('dateRange');
+              }}
+            />
+            <label className="form-check-label" htmlFor="dateRangeRadio">
+              Date Range
+            </label>
+          </div>
+          <div className="form-check">
+            <input
+              type="radio"
+              id="vehicleNumberRadio"
+              className="form-check-input"
+              value="vehicleNumber"
+              checked={searchOption === 'vehicleNumber'}
+              onChange={() => {
+                onSearchOptionChange('vehicleNumber');
+              }}
+            />
+            <label className="form-check-label" htmlFor="vehicleNumberRadio">
+              Vehicle Number
+            </label>
+          </div>
         </div>
 
         {searchOption === 'dateRange' && (
@@ -75,9 +86,8 @@ const SearchForm = ({
                   className="form-control"
                   value={endDate}
                   onChange={(e) => onEndDateChange(e.target.value)}
-                    max={new Date().toISOString().split('T')[0]} // Set max attribute to current date
-/>
-
+                  max={new Date().toISOString().split('T')[0]} // Set max attribute to current date
+                />
               </div>
               <div className="col-md-3">
                 <label htmlFor="status">Status:</label>
@@ -103,32 +113,37 @@ const SearchForm = ({
         )}
 
         {searchOption === 'vehicleNumber' && (
-        <div className="col-md-10">
-        <div className="form-group row">
-            <div className="col-md-4">
+          <div className="col-md-10">
+            <div className="form-group row">
+              <div className="col-md-4">
                 <label htmlFor="Vehicle Number" className="col-form-label">Vehicle Number:</label>
                 <div className="input-group">
-                    <input
-                        type="text"
-                        id="searchBox"
-                        className={`form-control ${vehicleNumber.length <= 10 ? 'is-valid' : 'is-invalid'}`}
-                        placeholder="Enter Vehicle Number"
-                        value={vehicleNumber}
-                        onChange={(e) => onVehicleNumberChange(e.target.value)}
-                    />&nbsp;
-                    <div className="input-group-append">
-                        <button type="button" className="btn btn-primary" onClick={onSearchByVehicleNumber}>
-                            <i className="fas fa-search"></i> 
-                        </button>
-                    </div>
-                    <div className="valid-feedback">Valid Vehicle Number</div>
+                  <input
+                    type="text"
+                    id="searchBox"
+                    className={`form-control ${initialLoad ? '' : (isVehicleNumberValid ? 'is-valid' : 'is-invalid')}`}
+                    placeholder="Enter Vehicle Number"
+                    value={vehicleNumber}
+                    onChange={(e) => onVehicleNumberChange(e.target.value)}
+                  />
+                  <div className="input-group-append">
+                  &nbsp;
+                    <button type="button" className="btn btn-primary" onClick={onSearchByVehicleNumber}>
+                      <i className="fas fa-search"></i> 
+                    </button>
+                    &nbsp;
+                    <button type="button" className="btn btn-secondary" onClick={() => onVehicleNumberChange('')}>
+                      <i className="fas fa-times"></i> 
+                    </button>
+                    &nbsp;
+                  </div>
+                  {!initialLoad && !isVehicleNumberValid && (
                     <div className="invalid-feedback">Invalid Vehicle Number</div>
+                  )}
                 </div>
+              </div>
             </div>
-        </div>
-    </div>
-    
-     
+          </div>
         )}
       </div>
     </div>
